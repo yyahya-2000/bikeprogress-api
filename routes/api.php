@@ -21,6 +21,7 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::post('user/edit', [UserController::class, 'edit']);
     Route::post('user/delete', [UserController::class, 'delete']);
     Route::get('users', [UserController::class, 'users']);
+    Route::post('user/read', [UserController::class, 'userById']);
 });
 
 Route::middleware('auth:sanctum')->group(function () {

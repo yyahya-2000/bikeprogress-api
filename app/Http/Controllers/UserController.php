@@ -15,6 +15,20 @@ class UserController extends Controller
         return User::all();
     }
 
+    public function userById(Request $request)
+    {
+        try {
+            if ($idUser = $request->input('id')) {
+                return User::query()->where('id', $idUser)->get();
+
+            }
+        } catch (Exception $e) {
+        }
+        return response()->json([
+            'message' => 'couldn\'t find the user',
+        ], Response::HTTP_BAD_REQUEST);
+    }
+
     public function delete(Request $request)
     {
         try {
