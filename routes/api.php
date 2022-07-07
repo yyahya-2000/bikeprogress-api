@@ -22,6 +22,7 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function () {
     Route::post('user/delete', [UserController::class, 'delete']);
     Route::get('users', [UserController::class, 'users']);
     Route::post('user/read', [UserController::class, 'userById']);
+    Route::post('user/edit/admin-reset-password', [UserController::class, 'adminresetPassword']);
 });
 
 Route::middleware('auth:sanctum')->group(function () {

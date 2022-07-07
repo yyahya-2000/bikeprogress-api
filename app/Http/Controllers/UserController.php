@@ -6,6 +6,7 @@ use App\Models\User;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Hash;
 
 
 class UserController extends Controller
@@ -20,7 +21,6 @@ class UserController extends Controller
         try {
             if ($idUser = $request->input('id')) {
                 return User::query()->where('id', $idUser)->get();
-
             }
         } catch (Exception $e) {
         }
@@ -62,5 +62,28 @@ class UserController extends Controller
         return $affected > 0 ?
             response()->json(['message' => 'success'], Response::HTTP_OK) :
             response()->json(['message' => 'couldn\'t update the user'], Response::HTTP_BAD_REQUEST);
+    }
+
+    public function adminResetPassword(Request $request)
+    {
+        try {
+            if ($idUser = $request->input('id')) {
+                $newPassword = $request->input('new-password');
+                User::query()->where('id', $idUser)->update([
+                    'password' => Hash::make($newPassword),
+//                    'firstname' => 'test'
+                ]);
+                return response()->json([
+                    'message' => 'success',
+//                    'user' => User::query()->where('id', $idUser)->get(),
+//                    'id' => $idUser,
+//                    'password' => $newPassword
+                ], Response::HTTP_OK);
+            }
+        } catch (Exception $e) {
+        }
+        return response()->json([
+            'message' => 'couldn\'t reset the user password',
+        ], Response::HTTP_BAD_REQUEST);
     }
 }
