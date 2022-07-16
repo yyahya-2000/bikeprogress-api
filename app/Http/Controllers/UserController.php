@@ -7,6 +7,8 @@ use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\Rule;
 
 
 class UserController extends Controller
@@ -50,6 +52,24 @@ class UserController extends Controller
         $affected = 0;
         try {
             $id = $request->input('id');
+            $rules = array(
+                'firstname' => 'required',
+                'lastname' => 'required',
+                'email' => [
+                    'required',
+                    Rule::unique('users')->ignore($id),
+                ],
+                'phone_number' => [
+                    'required',
+                    Rule::unique('users')->ignore($id),
+                    'regex:/^(\+7|7|8)?[\s\-]?\(?[489][0-9]{2}\)?[\s\-]?[0-9]{3}[\s\-]?[0-9]{2}[\s\-]?[0-9]{2}$/'
+                ],
+            );
+            $validator = Validator::make($request->all(), $rules);
+            if ($validator->fails()) {
+                return response()->json($validator->errors(), Response::HTTP_UNPROCESSABLE_ENTITY);
+            }
+
             $affected = User::query()->where('id', $id)->update([
                 'firstname' => $request->input('firstname'),
                 'lastname' => $request->input('lastname'),
