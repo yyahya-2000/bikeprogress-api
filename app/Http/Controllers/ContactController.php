@@ -6,6 +6,7 @@ use App\Models\Contact;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 
@@ -13,7 +14,39 @@ class ContactController extends Controller
 {
     public function index()
     {
-        return Contact::all();
+        return Contact::query()
+            ->leftJoin('purchases', 'contacts.id', '=', 'purchases.contact_id')
+            ->leftJoin('certificates', 'contacts.id', '=', 'certificates.contact_id')
+            ->select(
+                [
+                    'contacts.id',
+                    'contacts.firstname',
+                    'contacts.lastname',
+                    'contacts.contact_name',
+                    'contacts.patronymic',
+                    'contacts.phone_number',
+                    'contacts.extra_phone_number',
+                    'contacts.email',
+                    'contacts.extra_email',
+                    'contacts.loyalty',
+                    'contacts.note',
+                    DB::raw('COALESCE(SUM(purchases.price),0) as cost'),
+                    DB::raw('COUNT(purchases.id) as booking_number')
+                ]
+            )
+            ->groupBy(
+                'contacts.id',
+                'contacts.firstname',
+                'contacts.lastname',
+                'contacts.contact_name',
+                'contacts.patronymic',
+                'contacts.phone_number',
+                'contacts.extra_phone_number',
+                'contacts.email',
+                'contacts.extra_email',
+                'contacts.loyalty',
+                'contacts.note'
+            )->get();
     }
 
     public function create(Request $request)
